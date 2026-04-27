@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL | CV-B16 CLASSIFIED</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=VT323&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --text-color: #d1d1d1;
+            --accent-color: #ff0000;
+            --warning-yellow: #f1c40f;
+            --glass-bg: rgba(7, 0, 0, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: ambientFlicker 12s infinite;
+        }
+
+        @keyframes ambientFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { background-color: #050505; }
+            20%, 24%, 55% { background-color: #1a0505; }
+            22% { background-color: #0d0000; }
+        }
+
+        /* Police/Hazard Tape */
+        .hazard-tape {
+            position: fixed;
+            background: var(--warning-yellow);
+            color: #000;
+            font-family: 'Special Elite', cursive;
+            font-weight: bold;
+            padding: 5px 0;
+            width: 150vw;
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+
+        .tape-top { top: 10%; left: -25%; transform: rotate(-5deg); }
+        .tape-bottom { bottom: 10%; left: -25%; transform: rotate(3deg); }
+
+        /* Blood Drip Animation */
+        .blood-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.6;
+        }
+
+        /* Jumpscare Container */
+        #jumpscare-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: none;
+            background-color: #000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #jumpscare-img {
+            width: 120%;
+            height: 120%;
+            object-fit: cover;
+            filter: invert(1) contrast(5) brightness(1.2) sepia(1) saturate(10) hue-rotate(-50deg);
+            animation: shake 0.05s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(5px, 5px); }
+            50% { transform: translate(-5px, -5px) rotate(2deg); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Glassmorphism Main Frame */
+        .glass-frame {
+            position: relative;
+            z-index: 100;
+            width: 90%;
+            max-width: 850px;
+            height: 75vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 100px rgba(0, 0, 0, 1), inset 0 0 50px rgba(255, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .glitch-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 2.8rem;
+            color: var(--accent-color);
+            margin: 0;
+            letter-spacing: 8px;
+            animation: textGlitch 4s infinite;
+        }
+
+        @keyframes textGlitch {
+            0%, 90%, 100% { transform: translate(0); text-shadow: none; }
+            92% { transform: translate(2px, -2px); text-shadow: 2px 0 #fff, -2px 0 #f0f; }
+            94% { transform: translate(-2px, 2px); text-shadow: -2px 0 #fff, 2px 0 #f0f; }
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: #200;
+            border: 1px solid #500;
+            color: #888;
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        nav button:hover, nav button.active {
+            background: #600;
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h2 {
+            font-family: 'Special Elite', cursive;
+            color: #ff4d4d;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+        }
+
+        .lore-text {
+            border-left: 3px solid #600;
+            padding-left: 15px;
+            background: rgba(40, 0, 0, 0.2);
+            padding: 10px 15px;
+            font-style: italic;
+            margin: 15px 0;
+        }
+
+        .critical-warning {
+            border: 2px solid #ff0000;
+            background: rgba(255, 0, 0, 0.15);
+            padding: 15px;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 10000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body onclick="interact()">
+
+    <div class="crt-overlay"></div>
+    <canvas id="bloodCanvas" class="blood-canvas"></canvas>
+
+    <div class="hazard-tape tape-top">BIOHAZARD - DO NOT ENTER - INFECTED ZONE - CV-B16 - BIOHAZARD - DO NOT ENTER</div>
+    <div class="hazard-tape tape-bottom">KEEP OUT - QUARANTINE - KEEP OUT - QUARANTINE - KEEP OUT - QUARANTINE</div>
+
+    <div id="jumpscare-container">
+        <img id="jumpscare-img" src="Screenshot (30).jpg" alt="SYSTEM_ERROR">
+    </div>
+
+    <div class="glass-frame">
+        <header>
+            <h1 class="glitch-title">CV-B16: PROJECT CHUNGUS</h1>
+            <p style="color: #600; font-weight: bold;">[RESTRICTED ACCESS: AHAN-V10 / THATY MINATE PROTOCOL]</p>
+        </header>
+
+        <nav>
+            <button onclick="showSection('terminal')" class="active">TERMINAL</button>
+            <button onclick="showSection('origin')">SYNTHESIS</button>
+            <button onclick="showSection('lore')">CORRUPTED LOGS</button>
+            <button onclick="showSection('symptoms')">MUTATIONS</button>
+            <button onclick="showSection('global')">FINAL_NOTICE</button>
+        </nav>
+
+        <div class="content-area">
+            <div id="terminal" class="section active">
+                <h2>> SYSTEM_BREACH</h2>
+                <p>Pathogen <strong>CV-B16</strong> has evolved beyond the SARS-CoV-2 protein structure. It has begun to manifest <strong>Ahaan-v10</strong> physical traits in hosts within minutes of exposure.</p>
+                <div class="critical-warning">WARNING: BLOOD SATURATION OF CHUNGUS-PROTEINS AT 88%. THE WIDENING CANNOT BE STOPPED.</div>
+            </div>
+
+            <div id="origin" class="section">
+                <h2>> ORIGIN DATA</h2>
+                <p>The virus was born from a forbidden chemical reaction between <strong>Ahaan-v10</strong> essence and the <strong>Thaty Minate</strong> necro-virus. It was designed to create a "Wholesome" reality, but it created a biological nightmare instead.</p>
+                <p>The host's organs are liquified and reformed into dense, grey fibrous tissue to support the rapid increase in girth.</p>
+            </div>
+
+            <div id="lore" class="section">
+                <h2>> RECOVERED LOGS</h2>
+                <div class="lore-text">
+                    "Log 666: The subject has consumed the laboratory's entire supply of beta-carotene. His chest is now five feet wide. He is staring at the security camera... he isn't blinking. He's vibrating. Every time he hums, the yellow tape in the hallway starts to bleed."
+                </div>
+                <p>Subject 412 is no longer human. He is the first <strong>Apex Chungus</strong>. He is waiting for you to finish reading this.</p>
+            </div>
+
+            <div id="symptoms" class="section">
+                <h2>> STAGES OF HORROR</h2>
+                <ul>
+                    <li><strong>PHASE 1:</strong> Violent coughing fits that sound like deep laughter.</li>
+                    <li><strong>PHASE 2:</strong> Bones begin to creak and snap as they widen horizontally.</li>
+                    <li><strong>PHASE 3:</strong> Skin turns a matted grey. Ears elongate until they drag on the floor.</li>
+                    <li><strong>PHASE 4:</strong> Total loss of self. You are now a part of the Big One.</li>
+                </ul>
+            </div>
+
+            <div id="global" class="section">
+                <h2>> THE END</h2>
+                <p>Civilization is collapsing. The <strong>Thaty Minate</strong> virus is traveling through the power lines. There is no vaccine for <strong>Ahaan-v10</strong>.</p>
+                <div class="critical-alert">IF YOU FEEL THE URGE TO EAT A CARROT, IT IS TOO LATE. RUN.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Blood Drip Script
+        const canvas = document.getElementById('bloodCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const drops = [];
+        for(let i = 0; i < 30; i++) {
+            drops.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * -canvas.height,
+                speed: Math.random() * 2 + 1,
+                len: Math.random() * 50 + 20
+            });
+        }
+
+        function drawBlood() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = '#800';
+            drops.forEach(d => {
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, 3, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillRect(d.x - 1, d.y - d.len, 2, d.len);
+                d.y += d.speed;
+                if(d.y > canvas.height + d.len) {
+                    d.y = -d.len;
+                    d.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(drawBlood);
+        }
+        drawBlood();
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(Math.random() > 0.8) glitch();
+        }
+
+        function glitch() {
+            document.body.style.filter = 'invert(1) hue-rotate(180deg) blur(2px)';
+            setTimeout(() => document.body.style.filter = 'none', 100);
+        }
+
+        function triggerJumpscare() {
+            const container = document.getElementById('jumpscare-container');
+            container.style.display = 'flex';
+            setTimeout(() => {
+                container.style.display = 'none';
+                schedule();
+            }, 200);
+        }
+
+        function schedule() {
+            setTimeout(triggerJumpscare, Math.random() * 20000 + 10000);
+        }
+        
+        function interact() {
+            // Can be used to trigger sounds if needed
+        }
+
+        schedule();
+    </script>
+</body>
+</html>
